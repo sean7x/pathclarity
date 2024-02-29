@@ -11,4 +11,5 @@ python-dotenv>=0.5.1
 
 # environment requirements
 dvc
+dvc-gdrive
 pip>=23.3.2
