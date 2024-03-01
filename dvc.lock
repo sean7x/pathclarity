@@ -1,0 +1,21 @@
+schema: '2.0'
+stages:
+  make_dataset:
+    cmd: "mkdir -p data/interim\npython src/data/make_dataset.py --input_dir data/raw
+      --output_dir data/interim\n"
+    deps:
+    - path: data/raw/
+      hash: md5
+      md5: 3f1ed68620e5afd0d5f9d0bd67f1e148.dir
+      size: 207093162
+      nfiles: 13
+    - path: src/data/make_dataset.py
+      hash: md5
+      md5: b481efdb4fd9ce3877aa40d6a63f6f66
+      size: 1765
+    outs:
+    - path: data/interim/
+      hash: md5
+      md5: d87230ae68b2f4500e100a207f16531c.dir
+      size: 942519787
+      nfiles: 6
