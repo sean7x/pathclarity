@@ -1,30 +1,43 @@
 # -*- coding: utf-8 -*-
-import click
 import logging
+import os
 from pathlib import Path
-from dotenv import find_dotenv, load_dotenv
+import pandas as pd
+
+# Disable the FutureWarnings
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 
-@click.command()
-@click.argument('input_filepath', type=click.Path(exists=True))
-@click.argument('output_filepath', type=click.Path())
-def main(input_filepath, output_filepath):
+def main(input_dir, output_dir):
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
     """
     logger = logging.getLogger(__name__)
     logger.info('making final data set from raw data')
 
+    input_files = [os.path.join(input_dir, f) for f in sorted(os.listdir(input_dir)) if f.endswith('.sav')]
+    print(input_files) 
+
 
 if __name__ == '__main__':
+    import argparse
+
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     logging.basicConfig(level=logging.INFO, format=log_fmt)
 
-    # not used in this stub but often useful for finding various files
-    project_dir = Path(__file__).resolve().parents[2]
+    parser = argparse.ArgumentParser(desription='Load SPSS datasets and convert to CSV files')
+    parser.add_argument(
+        "--input_dir", type=str, required=True,
+        help='Directory to the input SPSS datasets'
+    )
+    parser.add_argument(
+        "--output_dir", type=str, required=True,
+        help='Directory to save the output CSV files'
+    )
+    args = parser.parse_args()    
 
-    # find .env automagically by walking up directories until it's found, then
-    # load up the .env entries as environment variables
-    load_dotenv(find_dotenv())
+    input_dir = Path(args.input_dir)
+    output_dir = Path(args.output_dir)
 
-    main()
+    main(input_dir, output_dir)
