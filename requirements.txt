@@ -14,3 +14,10 @@ dvc
 dvc-gdrive
 pip>=23.3.2
 pyreadstat
+scikit-learn
+altair
+vegafusion
+spacy
+wordcloud
+matplotlib
+spacy_transformers
