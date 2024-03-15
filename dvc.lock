@@ -6,9 +6,9 @@ stages:
     deps:
     - path: data/raw/
       hash: md5
-      md5: 3f1ed68620e5afd0d5f9d0bd67f1e148.dir
-      size: 207093162
-      nfiles: 13
+      md5: dd3308437a7c65f75ecfef3803a799e1.dir
+      size: 207100002
+      nfiles: 21
     - path: src/data/make_dataset.py
       hash: md5
       md5: b481efdb4fd9ce3877aa40d6a63f6f66
