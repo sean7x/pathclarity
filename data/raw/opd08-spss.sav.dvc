@@ -1,0 +1,5 @@
+outs:
+- md5: a0339264a32c24348b4ee4c4618a5fc6
+  size: 32103932
+  hash: md5
+  path: opd08-spss.sav
