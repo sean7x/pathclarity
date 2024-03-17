@@ -24,3 +24,4 @@ wordcloud
 matplotlib
 spacy_transformers
 gensim
+pyLDAvis
