@@ -23,3 +23,5 @@ wordcloud
 matplotlib
 gensim
 pyLDAvis
+transformers
+torch
