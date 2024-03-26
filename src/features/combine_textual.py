@@ -42,17 +42,17 @@ def combine_features(row, feature_list):
         # Combine `visitReason` and rule out the non-relevant reasons
         if feature == 'MAJOR':
             if pd.notna(row[feature]):
-                if row['MAJOR'].contains('Chronic problem') & row['MAJOR'].contains('routine'):
+                if ('Chronic problem' in row['MAJOR']) & ('routine' in row['MAJOR']):
                     row['CombinedText'] = ' '.join([row['CombinedText'], 'Routine_chronic_problem'])
-                elif row['MAJOR'].contains('Chronic problem') & row['MAJOR'].contains('flare-up'):
+                elif ('Chronic problem' in row['MAJOR']) & ('flare-up' in row['MAJOR']):
                     row['CombinedText'] = ' '.join([row['CombinedText'], 'Flare_up_chronic_problem'])
-                elif row['MAJOR'].contains('New problem'):
+                elif 'New problem' in row['MAJOR']:
                     row['CombinedText'] = ' '.join([row['CombinedText'], 'New_problem (less than 3 months onset)'])
-                elif row['MAJOR'].contains('Preventive care'):
+                elif 'Preventive care' in row['MAJOR']:
                     row['CombinedText'] = ' '.join([row['CombinedText'], 'Preventive_care'])
-                elif row['MAJOR'].contains('Pre/Post-surgery'):
+                elif 'Pre/Post-surgery' in row['MAJOR']:
                     row['CombinedText'] = ' '.join([row['CombinedText'], 'Pre_or_Post_surgery'])
-                elif row['MAJOR'].contains('Acute problem'):
+                elif 'Acute problem' in row['MAJOR']:
                     row['CombinedText'] = ' '.join([row['CombinedText'], 'Acute_problem'])
             continue
 
