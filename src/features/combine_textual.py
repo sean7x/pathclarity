@@ -40,7 +40,23 @@ def combine_features(row, feature_list):
             continue
 
         # Combine `visitReason` and rule out the non-relevant reasons
-        if feature in ['MAJOR', 'RFV1', 'RFV2', 'RFV3']:
+        if feature == 'MAJOR':
+            if pd.notna(row[feature]):
+                if row['MAJOR'].contains('Chronic problem') & row['MAJOR'].contains('routine'):
+                    row['CombinedText'] = ' '.join([row['CombinedText'], 'Routine_chronic_problem'])
+                elif row['MAJOR'].contains('Chronic problem') & row['MAJOR'].contains('flare-up'):
+                    row['CombinedText'] = ' '.join([row['CombinedText'], 'Flare_up_chronic_problem'])
+                elif row['MAJOR'].contains('New problem'):
+                    row['CombinedText'] = ' '.join([row['CombinedText'], 'New_problem (less than 3 months onset)'])
+                elif row['MAJOR'].contains('Preventive care'):
+                    row['CombinedText'] = ' '.join([row['CombinedText'], 'Preventive_care'])
+                elif row['MAJOR'].contains('Pre/Post-surgery'):
+                    row['CombinedText'] = ' '.join([row['CombinedText'], 'Pre_or_Post_surgery'])
+                elif row['MAJOR'].contains('Acute problem'):
+                    row['CombinedText'] = ' '.join([row['CombinedText'], 'Acute_problem'])
+            continue
+
+        if feature in ['RFV1', 'RFV2', 'RFV3']:
             if isinstance(row[feature], str) and row[feature] not in [
                 'Problems, complaints, NEC',
                 'Patient unable to speak English',
