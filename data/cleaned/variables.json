@@ -2,11 +2,11 @@
     "dateOfVisit": [
         "VMONTH",
         "VYEAR",
-        "VDAYR",
-        "YEAR"
+        "VDAYR"
     ],
     "demographics": [
         "AGE",
+        "AGER",
         "SEX",
         "ETHNIC",
         "RACE",
@@ -74,10 +74,7 @@
         "HTN",
         "IHD",
         "OBESITY",
-        "OSTPRSIS",
-        "NOCHRON",
-        "TOTCHRON",
-        "DMP"
+        "OSTPRSIS"
     ],
     "services": [
         "BREAST",
@@ -92,7 +89,6 @@
         "XRAY",
         "OTHIMAGE",
         "CBC",
-        "ELECTROL",
         "GLUCOSE",
         "HGBA",
         "CHOLEST",
@@ -105,7 +101,6 @@
         "PAPUNSP",
         "HPVDNA",
         "EKG",
-        "SPIRO",
         "URINE",
         "HTTAKE",
         "WTTAKE",
@@ -121,10 +116,7 @@
         "PSYCHOTH",
         "OTHMNTL",
         "EXCISION",
-        "ORTHO",
         "WOUND",
-        "ECHOCARD",
-        "OTHULTRA",
         "PROC1",
         "PROC2",
         "PROC3",
@@ -174,7 +166,6 @@
         "NUMCONT"
     ],
     "providersSeen": [
-        "NOPROVID",
         "PHYS",
         "PHYSASST",
         "NPNMW",
@@ -183,7 +174,6 @@
         "MHP"
     ],
     "visitDisposition": [
-        "NODISP",
         "REFOTHMD",
         "RETAPPT",
         "OTHDISP",
