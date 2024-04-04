@@ -40,6 +40,10 @@ def combine_features(row, feature_list):
             continue
 
         # Combine `visitReason` and rule out the non-relevant reasons
+        if feature == 'INJDET':
+            if pd.notna(row[feature]):
+                if ('None of the above' not in row['INJDET']) & ('More than one box is marked' not in row['INJDET']):
+                    row['CombinedText'] = ' '.join([row['CombinedText'], row['INJDET'].replace(' - ', '_').replace(' ', '_')])
         if feature == 'MAJOR':
             if pd.notna(row[feature]):
                 if ('Chronic problem' in row['MAJOR']) & ('routine' in row['MAJOR']):
@@ -47,7 +51,7 @@ def combine_features(row, feature_list):
                 elif ('Chronic problem' in row['MAJOR']) & ('flare-up' in row['MAJOR']):
                     row['CombinedText'] = ' '.join([row['CombinedText'], 'Flare_up_chronic_problem'])
                 elif 'New problem' in row['MAJOR']:
-                    row['CombinedText'] = ' '.join([row['CombinedText'], 'New_problem (less than 3 months onset)'])
+                    row['CombinedText'] = ' '.join([row['CombinedText'], 'New_problem']) # (less than 3 months onset)'])
                 elif 'Preventive care' in row['MAJOR']:
                     row['CombinedText'] = ' '.join([row['CombinedText'], 'Preventive_care'])
                 elif 'Pre/Post-surgery' in row['MAJOR']:
