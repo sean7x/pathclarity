@@ -53,4 +53,7 @@ if __name__ == '__main__':
     input_dir = Path(args.input_dir)
     output_dir = Path(args.output_dir)
 
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
     main(input_dir, output_dir)

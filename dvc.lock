@@ -1,21 +1,58 @@
 schema: '2.0'
 stages:
   make_dataset:
-    cmd: "mkdir -p data/interim\npython src/data/make_dataset.py --input_dir data/raw
-      --output_dir data/interim\n"
+    cmd: python src/data/make_dataset.py --input_dir data/raw --output_dir data/interim
     deps:
-    - path: data/raw/
+    - path: data/raw/opd2006-spss.sav
       hash: md5
-      md5: dd3308437a7c65f75ecfef3803a799e1.dir
-      size: 207100002
-      nfiles: 21
+      md5: 1568497ce52d2aa58bfa7bd0e94d028d
+      size: 34082967
+    - path: data/raw/opd2007-spss.sav
+      hash: md5
+      md5: 5dcb4748041929792a75dc6a715fcd54
+      size: 32391697
+    - path: data/raw/opd2008-spss.sav
+      hash: md5
+      md5: a0339264a32c24348b4ee4c4618a5fc6
+      size: 32103932
+    - path: data/raw/opd2009-spss.sav
+      hash: md5
+      md5: 4318b2dc616ebe652ab7e50d928ec10c
+      size: 32095000
+    - path: data/raw/opd2010-spss.sav
+      hash: md5
+      md5: 9778ff93644d802133856e16303bafe9
+      size: 34270150
+    - path: data/raw/opd2011-spss.sav
+      hash: md5
+      md5: 5f2c0dca315f0f8bfe6e18f945970c63
+      size: 34325452
     - path: src/data/make_dataset.py
       hash: md5
-      md5: b481efdb4fd9ce3877aa40d6a63f6f66
-      size: 1765
+      md5: 22e8fe9f586b88eca27617a95ecc43c5
+      size: 1895
     outs:
-    - path: data/interim/
+    - path: data/interim/opd2006.csv
       hash: md5
-      md5: d87230ae68b2f4500e100a207f16531c.dir
-      size: 942519787
-      nfiles: 6
+      md5: 0b55b6e400eb63af57bbfa8d7c249ec2
+      size: 167988542
+    - path: data/interim/opd2007.csv
+      hash: md5
+      md5: dba2c5e7bffbe56b96fc7a2b9d6a9f7a
+      size: 153121864
+    - path: data/interim/opd2008.csv
+      hash: md5
+      md5: 123a87dc3650f8bdceec4c276467b9e4
+      size: 152070292
+    - path: data/interim/opd2009.csv
+      hash: md5
+      md5: 84ec984b515337e35938e586f0522071
+      size: 149235931
+    - path: data/interim/opd2010.csv
+      hash: md5
+      md5: 676f59ecc073815386613706e73e7498
+      size: 160525718
+    - path: data/interim/opd2011.csv
+      hash: md5
+      md5: 57977d05a0d30bb82e0a2604b92ca816
+      size: 159781434

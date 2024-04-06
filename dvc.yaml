@@ -1,10 +1,18 @@
 stages:
   make_dataset:
-    cmd: |
-      mkdir -p data/interim
-      python src/data/make_dataset.py --input_dir data/raw --output_dir data/interim
+    cmd: python src/data/make_dataset.py --input_dir data/raw --output_dir data/interim
     deps:
-    - data/raw/
+    - data/raw/opd2006-spss.sav
+    - data/raw/opd2007-spss.sav
+    - data/raw/opd2008-spss.sav
+    - data/raw/opd2009-spss.sav
+    - data/raw/opd2010-spss.sav
+    - data/raw/opd2011-spss.sav
     - src/data/make_dataset.py
     outs:
-    - data/interim/
+    - data/interim/opd2006.csv
+    - data/interim/opd2007.csv
+    - data/interim/opd2008.csv
+    - data/interim/opd2009.csv
+    - data/interim/opd2010.csv
+    - data/interim/opd2011.csv
