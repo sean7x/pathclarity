@@ -177,5 +177,13 @@
         "RETAPPT",
         "OTHDISP",
         "ERADMHOS"
+    ],
+    "textFeature": [
+        "RFV1_TEXT",
+        "RFV2_TEXT",
+        "RFV3_TEXT",
+        "DIAG1_TEXT",
+        "DIAG2_TEXT",
+        "DIAG3_TEXT"
     ]
 }
