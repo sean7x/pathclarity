@@ -25,3 +25,4 @@ gensim
 pyLDAvis
 transformers
 torch
+imbalanced-learn
