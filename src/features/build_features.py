@@ -4,7 +4,7 @@ import pandas as pd
 
 
 def load_features(file_path):
-    """Load the variables dictionary"""
+    """Load the variables dictionary and return the features list"""
     import json
 
 
