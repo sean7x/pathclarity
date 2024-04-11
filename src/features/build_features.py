@@ -51,12 +51,12 @@ def build_features(df, features, rfv_df, icd9cm_df):
     
     def get_module(code):
         """Find the `START` and `END` range, 
-        and map the corresponding `MODULE_1` and `MODULE_2` to X_train as new columns `MOD1` and `MOD2`, 
+        and map the corresponding `MODULE_1` and `MODULE_2` to X_train as new columns `MODULE_1` and `MODULE_2`, 
         according to the value of `RFV1`, `RFV2`, and `RFV3` columns"""
 
-        module = rfv_df.loc[(rfv_df['START'] <= code) & (rfv_df['END'] >= code), ['MOD1', 'MOD2']]
+        module = rfv_df.loc[(rfv_df['START'] <= code) & (rfv_df['END'] >= code), ['MODULE_1', 'MODULE_2']]
         if len(module) == 0:
-            return pd.Series([pd.NA, pd.NA], index=['MOD1', 'MOD2'])
+            return pd.Series([pd.NA, pd.NA], index=['MODULE_1', 'MODULE_2'])
         else:
             return module.iloc[0]
     
@@ -121,13 +121,13 @@ def build_features(df, features, rfv_df, icd9cm_df):
 
     # Bin the REASON FOR VISIT variables into RFV Modules
     X[['RFV1_MOD1', 'RFV1_MOD2']] = X['RFV1'].apply(
-        lambda x: get_module(int(str(x)[:4])) if pd.notna(x) else pd.Series([pd.NA, pd.NA], index=['MOD1', 'MOD2'])
+        lambda x: get_module(int(str(x)[:4])) if pd.notna(x) else pd.Series([pd.NA, pd.NA], index=['MODULE_1', 'MODULE_2'])
     )
     X[['RFV2_MOD1', 'RFV2_MOD2']] = X['RFV2'].apply(
-        lambda x: get_module(int(str(x)[:4])) if pd.notna(x) else pd.Series([pd.NA, pd.NA], index=['MOD1', 'MOD2'])
+        lambda x: get_module(int(str(x)[:4])) if pd.notna(x) else pd.Series([pd.NA, pd.NA], index=['MODULE_1', 'MODULE_2'])
     )
     X[['RFV3_MOD1', 'RFV3_MOD2']] = X['RFV3'].apply(
-        lambda x: get_module(int(str(x)[:4])) if pd.notna(x) else pd.Series([pd.NA, pd.NA], index=['MOD1', 'MOD2'])
+        lambda x: get_module(int(str(x)[:4])) if pd.notna(x) else pd.Series([pd.NA, pd.NA], index=['MODULE_1', 'MODULE_2'])
     )
 
     # Bin the AGE variable into AGE Groups
