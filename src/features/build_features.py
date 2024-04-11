@@ -44,7 +44,7 @@ def load_icd9cm(file_path):
     return icd9cm_df
 
 
-def build_features(df, features, rfv_df, icd9cm_df):
+def build_features(df, features, rfv_df, icd9cm_df, category='CATEGORY_1'):
     """Preprocess and engineer the features, return X and y"""
     logger = logging.getLogger(__name__)
     logger.info('Preprocessing and engineering features\n')
@@ -60,7 +60,7 @@ def build_features(df, features, rfv_df, icd9cm_df):
         else:
             return module.iloc[0]
     
-    def get_icd9cm_3dcat(diag, prdiag, category='CATEGORY_1'):
+    def get_icd9cm_3dcat(diag, prdiag, category=category):
         """Map the three-digit categories of ICD-9-CM to 'DIAG1', 'DIAG2', and 'DIAG3',
         if 'PRDIAG1', 'PRDIAG2', and 'PRDIAG3' are not 1 respectively"""
 
@@ -165,7 +165,7 @@ def build_features(df, features, rfv_df, icd9cm_df):
     )
 
     # Employing the hierachical classifications of ICD-9-CM codes to prepare the target labels
-    y = df.apply(lambda x: get_icd9cm_3dcat(x.DIAG1, x.PRDIAG1, category='CATEGORY_1'), axis=1)
+    y = df.apply(lambda x: get_icd9cm_3dcat(x.DIAG1, x.PRDIAG1, category=category), axis=1)
 
 
     # Drop the rows from both X, y with NA in y
