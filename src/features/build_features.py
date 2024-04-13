@@ -174,10 +174,10 @@ def build_features(df, features, rfv_df, icd9cm_df, category='CATEGORY_1'):
     print()
 
     X = X.loc[non_missing_mask]
-    print(f'X_train Shape: {X.shape}')
+    print(f'X Shape: {X.shape}')
 
     y = y.loc[non_missing_mask]
-    print(f'y_train with {category} Shape: {y.shape}')
+    print(f'y with {category} Shape: {y.shape}')
 
 
     return X, y
