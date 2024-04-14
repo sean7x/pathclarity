@@ -43,7 +43,7 @@ def load_icd9cm(file_path):
     return icd9cm_df
 
 
-def build_features(df, features, rfv_df, icd9cm_df, category='CATEGORY_1'):
+def build_features(df, rfv_df, icd9cm_df, category='CATEGORY_1'):
     """Preprocess and engineer the features, return X and y"""
     logger = logging.getLogger(__name__)
     logger.info('Preprocessing and engineering features\n')
@@ -116,33 +116,33 @@ def build_features(df, features, rfv_df, icd9cm_df, category='CATEGORY_1'):
         else: return 'Hypertension'
 
         
-    X = df.loc[:, features].copy()
+    #X = df.loc[:, features].copy()
 
     # Bin the REASON FOR VISIT variables into RFV Modules
-    X[['RFV1_MOD1', 'RFV1_MOD2']] = X['RFV1'].apply(
+    df[['RFV1_MOD1', 'RFV1_MOD2']] = df['RFV1'].apply(
         lambda x: get_module(int(str(x)[:4])) if pd.notna(x) else pd.Series([pd.NA, pd.NA], index=['MODULE_1', 'MODULE_2'])
     )
-    X[['RFV2_MOD1', 'RFV2_MOD2']] = X['RFV2'].apply(
+    df[['RFV2_MOD1', 'RFV2_MOD2']] = df['RFV2'].apply(
         lambda x: get_module(int(str(x)[:4])) if pd.notna(x) else pd.Series([pd.NA, pd.NA], index=['MODULE_1', 'MODULE_2'])
     )
-    X[['RFV3_MOD1', 'RFV3_MOD2']] = X['RFV3'].apply(
+    df[['RFV3_MOD1', 'RFV3_MOD2']] = df['RFV3'].apply(
         lambda x: get_module(int(str(x)[:4])) if pd.notna(x) else pd.Series([pd.NA, pd.NA], index=['MODULE_1', 'MODULE_2'])
     )
 
     # Bin the AGE variable into AGE Groups
-    X['AGE_GROUP'] = X['AGE'].apply(bin_age)
+    df['AGE_GROUP'] = df['AGE'].apply(bin_age)
 
     # Bin the BMI variable into BMI Groups
-    X['BMI_GROUP'] = X['BMI'].apply(bin_bmi)
+    df['BMI_GROUP'] = df['BMI'].apply(bin_bmi)
 
     # Bin the TEMPF variable into TEMPF Groups
-    X['TEMPF_GROUP'] = X['TEMPF'].apply(bin_tempf)
+    df['TEMPF_GROUP'] = df['TEMPF'].apply(bin_tempf)
 
     # Bin the BPSYS variable into BPSYS Groups
-    X['BPSYS_GROUP'] = X['BPSYS'].apply(bin_bpsys)
+    df['BPSYS_GROUP'] = df['BPSYS'].apply(bin_bpsys)
 
     # Bin the BPDIAS variable into BPDIAS Groups
-    X['BPDIAS_GROUP'] = X['BPDIAS'].apply(bin_bpdias)
+    df['BPDIAS_GROUP'] = df['BPDIAS'].apply(bin_bpdias)
 
     # Handeling missing values in categorical features
     # Fill the missing values in the categorical features
@@ -151,10 +151,10 @@ def build_features(df, features, rfv_df, icd9cm_df, category='CATEGORY_1'):
     # with -9 for 'RFV1', 'RFV2', 'RFV3'
     # with 'NA' for 'RFV1_MOD1', 'RFV2_MOD1', 'RFV3_MOD1', 'RFV1_MOD2', 'RFV2_MOD2', 'RFV3_MOD2',
     # with 'NA' for 'AGE_GROUP', 'BMI_GROUP', 'TEMPF_GROUP', 'BPSYS_GROUP', 'BPDIAS_GROUP'
-    X.fillna({'CASTAGE': -9}, inplace=True)
-    X.fillna({'USETOBAC': -999, 'INJDET': -999, 'MAJOR': -999}, inplace=True)
-    X.fillna({'RFV1': -9, 'RFV2': -9, 'RFV3': -9}, inplace=True)
-    X.fillna(
+    df.fillna({'CASTAGE': -9}, inplace=True)
+    df.fillna({'USETOBAC': -999, 'INJDET': -999, 'MAJOR': -999}, inplace=True)
+    df.fillna({'RFV1': -9, 'RFV2': -9, 'RFV3': -9}, inplace=True)
+    df.fillna(
         {
             'RFV1_MOD1': 'NA', 'RFV2_MOD1': 'NA', 'RFV3_MOD1': 'NA',
             'RFV1_MOD2': 'NA', 'RFV2_MOD2': 'NA', 'RFV3_MOD2': 'NA',
@@ -164,22 +164,11 @@ def build_features(df, features, rfv_df, icd9cm_df, category='CATEGORY_1'):
     )
 
     # Employing the hierachical classifications of ICD-9-CM codes to prepare the target labels
-    y = df.apply(lambda x: get_icd9cm_3dcat(x.DIAG1, x.PRDIAG1, category=category), axis=1)
+    df['DIAG1_CAT'] = df.apply(lambda x: get_icd9cm_3dcat(x.DIAG1, x.PRDIAG1, category=category), axis=1)
+    df['DIAG2_CAT'] = df.apply(lambda x: get_icd9cm_3dcat(x.DIAG2, x.PRDIAG2, category=category), axis=1)
+    df['DIAG3_CAT'] = df.apply(lambda x: get_icd9cm_3dcat(x.DIAG3, x.PRDIAG3, category=category), axis=1)
 
-
-    # Drop the rows from both X, y with NA in y
-    non_missing_mask = y.notna()
-    print(f'Number of available dependent samples: {non_missing_mask.sum()}')
-    print()
-
-    X = X.loc[non_missing_mask]
-    print(f'X Shape: {X.shape}')
-
-    y = y.loc[non_missing_mask]
-    print(f'y with {category} Shape: {y.shape}')
-
-
-    return X, y
+    return df
 
 
 def combine_textual(row, features):
@@ -268,7 +257,7 @@ def combine_textual(row, features):
 
         if feature == 'CANCER':
             if row[feature] == 1:
-                row['TEXT'] = ' '.join([row['TEXT'], '_'.join((row['CASTAGE'] + ' Cancer').split())])
+                row['TEXT'] = ' '.join([row['TEXT'], 'Cancer'])
             continue
 
         if feature == 'CEBVD':
