@@ -392,3 +392,41 @@ def generate_topic_features(df, n_topics=10, n_top_words=10, transform=False, ra
     df = pd.concat([df, topics], axis=1)
     print(f'DataFrame Shape: {df.shape}')
     return df, vectorizer, tf, lda, topic_features
+
+
+def generate_embeddings(df):
+    """Add in sentence embeddings using BERT and pre-trained BiomedBERT model."""
+    logger = logging.getLogger(__name__)
+    logger.info('Generating sentence embeddings using BERT and pre-trained BiomedBERT model\n')
+
+    from transformers import AutoTokenizer, AutoModel
+    import torch
+
+    if torch.cuda.is_available():
+        device = 'cuda'
+    elif torch.backends.mps.is_available():
+        device= 'mps'
+    else:
+        device = 'cpu'
+    print(f'Using device: {device}')
+
+    model_name = "microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract-fulltext"
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModel.from_pretrained(model_name).to(device)
+
+
+    text = df['TEXT'].tolist()
+
+    encoded_input = tokenizer(text, return_tensors='pt', padding=True, truncation=True, max_length=512).to(device)
+
+    with torch.no_grad():
+        output = model(**encoded_input)
+        sentence_embedding = output.last_hidden_state[:, 0, :]
+        #sentence_embedding = output.pooler_output
+        
+        sentence_embedding.cpu().numpy()
+    
+    embed_features = [f'EMBED_{i}' for i in range(sentence_embedding.shape[1])]
+    embed_df = pd.DataFrame(sentence_embedding, columns=embed_features)
+
+    return pd.concat([df, embed_df], axis=1)
