@@ -181,3 +181,59 @@ def build_features(df, features, rfv_df, icd9cm_df, category='CATEGORY_1'):
 
 
     return X, y
+
+
+def generate_topic_features(df, n_topics=10, n_top_words=10, transform=False, random_state=42):
+    """Generate topic features (topic probabilities) from text features using LDA."""
+    import spacy
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.decomposition import LatentDirichletAllocation
+    import numpy as np
+
+    # Preprocess the text features with Spacy
+    nlp = spacy.load('en_core_web_sm')
+
+    def preprocess_text(text):
+        doc = nlp(text)
+        return ' '.join([token.lemma_.lower() for token in doc if not token.is_stop and not token.is_punct])
+
+    df['TEXT'] = df['TEXT'].apply(preprocess_text)
+
+    # Define the count vectorizer
+    vectorizer = TfidfVectorizer(
+        #stop_words='english',
+        ngram_range=(1, 1),
+        max_features=1000,
+        min_df=1,
+        max_df=0.95,
+    )
+    tf = vectorizer.fit_transform(df['TEXT'])
+
+    lda = LatentDirichletAllocation(n_components=n_topics, learning_method='batch', n_jobs=-1, random_state=random_state)
+    lda.fit(tf)
+
+    # Define the function to display the top words for each topic
+    def display_topics(model, feature_names, n_top_words):
+        for topic_idx, topic in enumerate(model.components_):
+            print(f'Topic {topic_idx}:')
+            print(' '.join([feature_names[i] for i in topic.argsort()[:-n_top_words - 1:-1]]))
+            print()
+    
+    display_topics(lda, vectorizer.get_feature_names_out(), n_top_words)
+
+    # Define the topic features
+    topics = lda.transform(tf)
+    topic_features = [f'TOPIC_{i}' for i in range(topics.shape[1])]
+    print(f'Topic Features: {topic_features}')
+    topics = pd.DataFrame(topics, columns=topic_features, index=df.index)
+
+    # Transform the topic features with PowerTransformer or Log transformation
+    if transform == 'power':
+        topics = np.sqrt(topics)
+    elif transform == 'log':
+        topics = np.log(topics + 0.0001)
+
+    # Combine the topic features with df
+    df = pd.concat([df, topics], axis=1)
+    print(f'DataFrame Shape: {df.shape}')
+    return df, vectorizer, tf, lda, topic_features
