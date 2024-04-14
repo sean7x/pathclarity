@@ -7,7 +7,6 @@ def load_features(file_path):
     """Load the variables dictionary and return the features list"""
     import json
 
-
     with open(file_path, 'r') as f:
         variables = json.load(f)
     print(f'Variables keys: {variables.keys()}')
@@ -183,12 +182,168 @@ def build_features(df, features, rfv_df, icd9cm_df, category='CATEGORY_1'):
     return X, y
 
 
+def combine_textual(row, features):
+    """Convert and combine textual features into 'TEXT'"""
+    logger = logging.getLogger(__name__)
+    logger.info("Combining text features into 'TEXT'\n")
+
+    row['Text'] = ''
+
+    for feature in features:
+        if feature == 'AGE':
+            if pd.notna(row[feature]):
+                # Combine 'AGE' as direct text description followed by 'AGE_GROUP'
+                row['TEXT'] = ' '.join([
+                    row['TEXT'], f'{int(row[feature])}_year_old',
+                    '_'.join(row['AGE_GROUP'].split())
+                ])
+            continue
+
+        if feature == 'SEX':
+            if pd.notna(row[feature]):
+                if row[feature] == 1:
+                    row['TEXT'] = ' '.join([row['TEXT'], 'Female'])
+                elif row[feature] == 0:
+                    row['TEXT'] = ' '.join([row['TEXT'], 'Male'])
+            continue
+
+        # Comine `USETOBAC` if the patient is a current tobacco user
+        if feature == 'USETOBAC':
+            if row[feature] == 2:
+                row['TEXT'] = ' '.join([row['TEXT'], 'Tobacco_User'])
+            continue
+
+        # Combine `visitReason` and rule out the non-relevant reasons
+        if feature == 'INJDET':
+            if pd.notna(row[feature]):
+                if row[feature] == 1:
+                    row['TEXT'] = ' '.join([row['TEXT'], 'Unintentional injury/poisoning'])
+                elif row[feature] == 2:
+                    row['TEXT'] = ' '.join([row['TEXT'], 'Intentional injury/poisoning'])
+                elif row[feature] == 3:
+                    row['TEXT'] = ' '.join([row['TEXT'], 'Injury/poisoning - unknown_intent'])
+                elif row[feature] == 4:
+                    row['TEXT'] = ' '.join([row['TEXT'], 'Adverse_effect of medical/surgical care or adverse_effect of medicinal drug'])
+            continue
+
+        if feature == 'MAJOR':
+            if pd.notna(row[feature]):
+                if row[feature] == 1:
+                    row['TEXT'] = ' '.join([row['TEXT'], 'New problem'])
+                elif row[feature] == 2:
+                    row['TEXT'] = ' '.join([row['TEXT'], 'Chronic problem, routine'])
+                elif row[feature] == 3:
+                    row['TEXT'] = ' '.join([row['TEXT'], 'Chronic problem, flare_up'])
+                elif row[feature] == 4:
+                    row['TEXT'] = ' '.join([row['TEXT'], 'Pre-/Post-surgery'])
+                elif row[feature] == 5:
+                    row['TEXT'] = ' '.join([row['TEXT'], 'Preventive care (e.g. routine prenatal, well-baby, screening, insurance, general exams)'])
+            continue
+
+        if feature in ['RFV1', 'RFV2', 'RFV3']:
+            if pd.notna(row[feature]) & (row[feature] != -9):
+                # Combine 'RFVx_TEXT', followed by 'RFVx_MOD2', 'RFVx_MOD1'
+                row['TEXT'] = ' '.join([row['TEXT'], row[f'{feature}_TEXT'], row[f'{feature}_MOD2'], row[f'{feature}_MOD1']])
+            continue
+
+        if feature in ['BMI', 'TEMPF', 'BPSYS', 'BPDIAS']:
+            if pd.notna(row[feature]):
+                # Combine 'feature_GROUP'
+                row['TEXT'] = ' '.join([
+                    row['TEXT'],
+                    '_'.join(row[f'{feature}_GROUP'].split())
+                ])
+            continue
+
+        # Convert and combine `presentSymptomsStatus` as direct text description
+        if feature == 'ARTHRTIS':
+            if row[feature] == 1:
+                row['TEXT'] = ' '.join([row['TEXT'], 'Arthritis'])
+            continue
+
+        if feature == 'ASTHMA':
+            if row[feature] == 1:
+                row['TEXT'] = ' '.join([row['TEXT'], 'Asthma'])
+            continue
+
+        if feature == 'CANCER':
+            if row[feature] == 1:
+                row['TEXT'] = ' '.join([row['TEXT'], '_'.join((row['CASTAGE'] + ' Cancer').split())])
+            continue
+
+        if feature == 'CEBVD':
+            if row[feature] == 1:
+                row['TEXT'] = ' '.join([row['TEXT'], 'Cerebrovascular_disease'])
+            continue
+
+        if feature == 'CHF':
+            if row[feature] == 1:
+                row['TEXT'] = ' '.join([row['TEXT'], 'Congestive_heart_failure'])
+            continue
+
+        if feature == 'CRF':
+            if row[feature] == 1:
+                row['TEXT'] = ' '.join([row['TEXT'], 'Chronic_renal_failure'])
+            continue
+
+        if feature == 'COPD':
+            if row[feature] == 1:
+                row['TEXT'] = ' '.join([row['TEXT'], 'Chronic_obstructive_pulmonary_disease'])
+            continue
+
+        if feature == 'DEPRN':
+            if row[feature] == 1:
+                row['TEXT'] = ' '.join([row['TEXT'], 'Depression'])
+            continue
+
+        if feature == 'DIABETES':
+            if row[feature] == 1:
+                row['TEXT'] = ' '.join([row['TEXT'], 'Diabetes'])
+            continue
+
+        if feature == 'HYPLIPID':
+            if row[feature] == 1:
+                row['TEXT'] = ' '.join([row['TEXT'], 'Hyperlipidemia'])
+            continue
+
+        if feature == 'HTN':
+            if row[feature] == 1:
+                row['TEXT'] = ' '.join([row['TEXT'], 'Hypertension'])
+            continue
+
+        if feature == 'IHD':
+            if row[feature] == 1:
+                row['TEXT'] = ' '.join([row['TEXT'], 'Ischemic_heart_disease'])
+            continue
+
+        if feature == 'OBESITY':
+            if row[feature] == 1:
+                row['TEXT'] = ' '.join([row['TEXT'], 'Obesity'])
+            continue
+
+        if feature == 'OSTPRSIS':
+            if row[feature] == 1:
+                row['TEXT'] = ' '.join([row['TEXT'], 'Osteoporosis'])
+            continue
+
+        # Combine `physicianDiagnoses` and rule out 'PROBABLE, QUESTIONABLE, OR RULE OUT' diagnoses
+        if feature in ['DIAG1', 'DIAG2', 'DIAG3']:
+            if pd.notna(row[feature]) and (pd.isna(row[f'PR{feature}']) | row[f'PR{feature}'] != 1):
+                row['TEXT'] = ' '.join([row['TEXT'], row[f'{feature}_TEXT']])
+            continue
+
+    return row['TEXT'].strip()
+
+
 def generate_topic_features(df, n_topics=10, n_top_words=10, transform=False, random_state=42):
     """Generate topic features (topic probabilities) from text features using LDA."""
     import spacy
     from sklearn.feature_extraction.text import TfidfVectorizer
     from sklearn.decomposition import LatentDirichletAllocation
     import numpy as np
+
+    logger = logging.getLogger(__name__)
+    logger.info('Generating topic features (topic probabilities) from text features using LDA\n')
 
     # Preprocess the text features with Spacy
     nlp = spacy.load('en_core_web_sm')
@@ -204,8 +359,8 @@ def generate_topic_features(df, n_topics=10, n_top_words=10, transform=False, ra
         #stop_words='english',
         ngram_range=(1, 1),
         max_features=1000,
-        min_df=1,
-        max_df=0.95,
+        min_df=5,
+        max_df=0.7,
     )
     tf = vectorizer.fit_transform(df['TEXT'])
 
