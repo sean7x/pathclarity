@@ -187,7 +187,7 @@ def combine_textual(row, features):
     logger = logging.getLogger(__name__)
     logger.info("Combining text features into 'TEXT'\n")
 
-    row['Text'] = ''
+    row['TEXT'] = ''
 
     for feature in features:
         if feature == 'AGE':
