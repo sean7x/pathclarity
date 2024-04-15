@@ -55,7 +55,7 @@ def build_features(df, rfv_df, icd9cm_df, category='CATEGORY_1'):
 
         module = rfv_df.loc[(rfv_df['START'] <= code) & (rfv_df['END'] >= code), ['MODULE_1', 'MODULE_2']]
         if len(module) == 0:
-            return pd.Series([pd.NA, pd.NA], index=['MODULE_1', 'MODULE_2'])
+            return pd.Series([None, None], index=['MODULE_1', 'MODULE_2'])
         else:
             return module.iloc[0]
     
@@ -70,13 +70,13 @@ def build_features(df, rfv_df, icd9cm_df, category='CATEGORY_1'):
                 else:
                     return icd9cm_df[icd9cm_df['3D_CODE'] == diag[:3]][category].values[0]
             else:
-                return pd.NA
+                return None
         except:
             print(f'Error: {diag}')
             print(f'Error: {prdiag}')
         
     def bin_age(age):
-        if pd.isna(age): return pd.NA
+        if pd.isna(age) or age == -9: return None
         #if age < 2: return 'Infant'
         #elif age < 4: return 'Toddler'
         #elif age < 12: return 'Child'
@@ -87,14 +87,14 @@ def build_features(df, rfv_df, icd9cm_df, category='CATEGORY_1'):
         else: return 'Senior'
     
     def bin_bmi(bmi):
-        if pd.isna(bmi): return pd.NA
+        if pd.isna(bmi): return None
         elif bmi < 18.5: return 'Underweight'
         elif bmi < 25: return 'Normal weight'
         elif bmi < 30: return 'Overweight'
         else: return 'Obesity'
     
     def bin_tempf(tempf):
-        if pd.isna(tempf): return pd.NA
+        if pd.isna(tempf): return None
         elif tempf < 95: return 'Hypothermia'
         elif tempf < 99: return 'Normal temperature'
         #elif tempf < 100: return 'Low grade fever'
@@ -102,14 +102,14 @@ def build_features(df, rfv_df, icd9cm_df, category='CATEGORY_1'):
         else: return 'Hyperpyrexia'
     
     def bin_bpsys(bpsys):
-        if pd.isna(bpsys): return pd.NA
+        if pd.isna(bpsys): return None
         elif bpsys < 90: return 'Hypotension'
         elif bpsys < 120: return 'Normal blood pressure'
         elif bpsys < 140: return 'Prehypertension'
         else: return 'Hypertension'
 
     def bin_bpdias(bpdias):
-        if pd.isna(bpdias): return pd.NA
+        if pd.isna(bpdias): return None
         elif bpdias < 60: return 'Low diastolic blood pressure'
         elif bpdias < 90: return 'Normal diastolic blood pressure'
         elif bpdias < 110: return 'High diastolic blood pressure'
@@ -120,13 +120,13 @@ def build_features(df, rfv_df, icd9cm_df, category='CATEGORY_1'):
 
     # Bin the REASON FOR VISIT variables into RFV Modules
     df[['RFV1_MOD1', 'RFV1_MOD2']] = df['RFV1'].apply(
-        lambda x: get_module(int(str(x)[:4])) if pd.notna(x) else pd.Series([pd.NA, pd.NA], index=['MODULE_1', 'MODULE_2'])
+        lambda x: get_module(int(str(x)[:4])) if pd.notna(x) else pd.Series([None, None], index=['MODULE_1', 'MODULE_2'])
     )
     df[['RFV2_MOD1', 'RFV2_MOD2']] = df['RFV2'].apply(
-        lambda x: get_module(int(str(x)[:4])) if pd.notna(x) else pd.Series([pd.NA, pd.NA], index=['MODULE_1', 'MODULE_2'])
+        lambda x: get_module(int(str(x)[:4])) if pd.notna(x) else pd.Series([None, None], index=['MODULE_1', 'MODULE_2'])
     )
     df[['RFV3_MOD1', 'RFV3_MOD2']] = df['RFV3'].apply(
-        lambda x: get_module(int(str(x)[:4])) if pd.notna(x) else pd.Series([pd.NA, pd.NA], index=['MODULE_1', 'MODULE_2'])
+        lambda x: get_module(int(str(x)[:4])) if pd.notna(x) else pd.Series([None, None], index=['MODULE_1', 'MODULE_2'])
     )
 
     # Bin the AGE variable into AGE Groups
