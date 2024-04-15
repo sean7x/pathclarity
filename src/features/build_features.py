@@ -147,12 +147,12 @@ def build_features(df, rfv_df, icd9cm_df, category='CATEGORY_1'):
     # Handeling missing values in categorical features
     # Fill the missing values in the categorical features
     # with -9 for 'CASTAGE',
-    # with -999 for 'USETOBAC', 'INJDET', 'MAJOR',
+    # with -9 for 'USETOBAC', 'INJDET', 'MAJOR',
     # with -9 for 'RFV1', 'RFV2', 'RFV3'
     # with 'NA' for 'RFV1_MOD1', 'RFV2_MOD1', 'RFV3_MOD1', 'RFV1_MOD2', 'RFV2_MOD2', 'RFV3_MOD2',
     # with 'NA' for 'AGE_GROUP', 'BMI_GROUP', 'TEMPF_GROUP', 'BPSYS_GROUP', 'BPDIAS_GROUP'
     df.fillna({'CASTAGE': -9}, inplace=True)
-    df.fillna({'USETOBAC': -999, 'INJDET': -999, 'MAJOR': -999}, inplace=True)
+    df.fillna({'USETOBAC': -9, 'INJDET': -9, 'MAJOR': -9}, inplace=True)
     df.fillna({'RFV1': -9, 'RFV2': -9, 'RFV3': -9}, inplace=True)
     df.fillna(
         {
