@@ -168,6 +168,12 @@ def build_features(df, rfv_df, icd9cm_df, category='CATEGORY_1'):
     df['DIAG2_CAT'] = df.apply(lambda x: get_icd9cm_3dcat(x.DIAG2, x.PRDIAG2, category=category), axis=1)
     df['DIAG3_CAT'] = df.apply(lambda x: get_icd9cm_3dcat(x.DIAG3, x.PRDIAG3, category=category), axis=1)
 
+    # Drop the rows with non-relatative label
+    # (SUPPLEMENTARY CLASSIFICATION OF FACTORS INFLUENCING HEALTH STATUS AND CONTACT WITH HEALTH SERVICES)
+    df = df[
+        df['DIAG1_CAT'] != 'SUPPLEMENTARY CLASSIFICATION OF FACTORS INFLUENCING HEALTH STATUS AND CONTACT WITH HEALTH SERVICES'
+    ]
+
     return df
 
 
