@@ -64,7 +64,7 @@ def build_features(df, rfv_df, icd9cm_df, category='CATEGORY_1'):
         if 'PRDIAG1', 'PRDIAG2', and 'PRDIAG3' are not 1 respectively"""
 
         try:
-            if pd.notna(diag) and (pd.isna(prdiag) | prdiag != 1):
+            if pd.notna(diag) and diag != '-9' and (pd.isna(prdiag) | prdiag != 1):
                 if diag == 'V997-':
                     return 'No diagnosis/disease or healthy'
                 else:
