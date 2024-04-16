@@ -28,3 +28,4 @@ torch
 imbalanced-learn
 openpyxl
 vl-convert-python>=1.3.0
+seaborn
