@@ -1,0 +1,5 @@
+outs:
+- md5: 78878a228bc774ad53dbbcd9dcea7b24
+  size: 6693649679
+  hash: md5
+  path: RandomForestClassifier_halving_search_model.joblib
