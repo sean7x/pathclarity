@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import pandas as pd
+import altair as alt
 
 
 def load_features(file_path):
@@ -425,3 +426,104 @@ def generate_embeddings(df):
     embed_df = pd.DataFrame(sentence_embedding, columns=embed_features)
 
     return pd.concat([df, embed_df], axis=1)
+
+
+def chart(df, x, y, title, color=alt.value('steelblue'), width=480, height=320):
+    """Pre-define chart function"""
+    return alt.Chart(df).encode(
+        x=x,
+        y=y,
+        color=color,
+    ).properties(
+    title=title,
+    width=width,
+    height=height,
+).configure(
+    axis=alt.AxisConfig(
+        domain=False, # remove axis line
+        ticks=False, # remove ticks
+        labelAngle=0, # rotate labels
+        labelColor='gray', # color of labels
+        labelFontSize=10,
+    ),
+    font='Helvetica Neue',
+    view=alt.ViewConfig(stroke=None), # remove border
+)
+
+
+def prepare_data(df, df_type, cleaned_data_path, figure_path, report_path, icd9cm_category='CATEGORY_1'):
+    """Load and prepare the data for classification, return the processed DataFrame."""
+    import os
+    import pyLDAvis
+    import pyLDAvis.lda_model
+
+    # Load the variables dictionary and return the features list
+    varaibles_path = os.path.join(cleaned_data_path, 'variables.json')
+    features = load_features(varaibles_path)
+
+    # Load and clean the REASON FOR VISIT classification summary of codes
+    rfv_path = os.path.join('..', 'data', 'raw', 'RFV_codes_summary.xlsx')
+    rfv_df = load_rfv(rfv_path)
+
+    # Load the list of three-digit categories of ICD-9-CM
+    icd9cm_path = os.path.join('..', 'data', 'raw', 'ICD9CM_3DCat.xlsx')
+    icd9cm_df = load_icd9cm(icd9cm_path)
+
+    icd9cm_category = icd9cm_category
+
+
+    df = build_features(df, rfv_df, icd9cm_df, category=icd9cm_category)
+
+    # Drop the rows from with NA in 'DIAG1_CAT'
+    non_missing_mask = df['DIAG1_CAT'].notna()
+    procd_df = df.loc[
+        non_missing_mask,
+        ['DIAG1_CAT'] + features + [
+            'RFV1_MOD1', 'RFV1_MOD2', 'RFV2_MOD1', 'RFV2_MOD2', 'RFV3_MOD1', 'RFV3_MOD2',
+            'AGE_GROUP', 'BMI_GROUP', 'TEMPF_GROUP', 'BPSYS_GROUP', 'BPDIAS_GROUP'
+        ]
+    ].copy()
+    print(f'Number of available dependent samples: {non_missing_mask.sum()}')
+    print()
+
+    # Combine and preprocess textual features
+    procd_df['TEXT'] = procd_df.apply(lambda x: combine_textual(x, features), axis=1)
+
+    # Add in sentence embeddings using BERT and pre-trained BiomedBERT model
+    #procd_df = .generate_embeddings(procd_df)
+
+    # Add in topic feature (topic probabilities) using LDA
+    procd_df, vectorizer, tf, lda, topic_features = generate_topic_features(
+        procd_df, n_topics=10, n_top_words=10, transform='log'
+    )
+
+    # Visualize the topics with pyLDAvis
+    lda_vis = pyLDAvis.lda_model.prepare(lda, tf, vectorizer, mds='tsne')
+    pyLDAvis.save_html(lda_vis, os.path.join(figure_path, f'{df_type}_lda_vis.html'))
+    pyLDAvis.save_json(lda_vis, os.path.join(report_path, f'{df_type}_lda_vis.json'))
+
+    # Plot the heat map of topic distributions among the labels in the dataset with Altair
+    topic_df = procd_df[['DIAG1_CAT'] + topic_features].melt(id_vars='DIAG1_CAT', var_name='Topic', value_name='Probability')
+
+    chart(
+        df=topic_df,
+        y='DIAG1_CAT:N',
+        x='Topic:N',
+        color='Probability:Q',
+        title=f'Distribution of the Labels in the {df_type} Dataset',
+    ).mark_rect().configure_axisY(
+        labelLimit=500, title=None
+    ).configure_axisX(
+        labelAngle=45,
+        title=None
+    ).properties(width=300, height=500).save(os.path.join(figure_path, f'{df_type}_topic_distribution_heatmap.png'), ppi=300)
+
+    # Plot the distribution and percentage of true labels
+    chart(
+        df=procd_df['DIAG1_CAT'].value_counts(normalize=True).reset_index(),
+        x='DIAG1_CAT:N',
+        y='proportion:Q',
+        title=f'Distribution of the Labels in the {df_type} Dataset',
+    ).mark_bar().configure_axisX(labelAngle=45, labelLimit=300, title=None).configure_axisY(title=None).save(os.path.join(figure_path, f'{df_type}_label_distribution.png'), ppi=300)
+    
+    return procd_df
