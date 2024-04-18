@@ -198,54 +198,54 @@ def combine_textual(row, features):
         if feature == 'SEX':
             if pd.notna(row[feature]):
                 if row[feature] == 1:
-                    row['TEXT'] = ' '.join([row['TEXT'], 'Female'])
+                    row['TEXT'] = ', '.join([row['TEXT'], 'Female'])
                 elif row[feature] == 0:
-                    row['TEXT'] = ' '.join([row['TEXT'], 'Male'])
+                    row['TEXT'] = ', '.join([row['TEXT'], 'Male'])
             continue
 
         # Comine `USETOBAC` if the patient is a current tobacco user
         if feature == 'USETOBAC':
             if row[feature] == 2:
-                row['TEXT'] = ' '.join([row['TEXT'], 'Tobacco_User'])
+                row['TEXT'] = ', '.join([row['TEXT'], 'Tobacco_User'])
             continue
 
         # Combine `visitReason` and rule out the non-relevant reasons
         if feature == 'INJDET':
             if pd.notna(row[feature]):
                 if row[feature] == 1:
-                    row['TEXT'] = ' '.join([row['TEXT'], 'Unintentional injury/poisoning'])
+                    row['TEXT'] = ', '.join([row['TEXT'], 'Unintentional injury/poisoning'])
                 elif row[feature] == 2:
-                    row['TEXT'] = ' '.join([row['TEXT'], 'Intentional injury/poisoning'])
+                    row['TEXT'] = ', '.join([row['TEXT'], 'Intentional injury/poisoning'])
                 elif row[feature] == 3:
-                    row['TEXT'] = ' '.join([row['TEXT'], 'Injury/poisoning - unknown_intent'])
+                    row['TEXT'] = ', '.join([row['TEXT'], 'Injury/poisoning - unknown_intent'])
                 elif row[feature] == 4:
-                    row['TEXT'] = ' '.join([row['TEXT'], 'Adverse_effect of medical/surgical care or adverse_effect of medicinal drug'])
+                    row['TEXT'] = ', '.join([row['TEXT'], 'Adverse_effect of medical/surgical care or adverse_effect of medicinal drug'])
             continue
 
         if feature == 'MAJOR':
             if pd.notna(row[feature]):
                 if row[feature] == 1:
-                    row['TEXT'] = ' '.join([row['TEXT'], 'New problem'])
+                    row['TEXT'] = ', '.join([row['TEXT'], 'New problem'])
                 elif row[feature] == 2:
-                    row['TEXT'] = ' '.join([row['TEXT'], 'Chronic problem, routine'])
+                    row['TEXT'] = ', '.join([row['TEXT'], 'Chronic problem, routine'])
                 elif row[feature] == 3:
-                    row['TEXT'] = ' '.join([row['TEXT'], 'Chronic problem, flare_up'])
+                    row['TEXT'] = ', '.join([row['TEXT'], 'Chronic problem, flare_up'])
                 elif row[feature] == 4:
-                    row['TEXT'] = ' '.join([row['TEXT'], 'Pre-/Post-surgery'])
+                    row['TEXT'] = ', '.join([row['TEXT'], 'Pre-/Post-surgery'])
                 elif row[feature] == 5:
-                    row['TEXT'] = ' '.join([row['TEXT'], 'Preventive care (e.g. routine prenatal, well-baby, screening, insurance, general exams)'])
+                    row['TEXT'] = ', '.join([row['TEXT'], 'Preventive care (e.g. routine prenatal, well-baby, screening, insurance, general exams)'])
             continue
 
         if feature in ['RFV1', 'RFV2', 'RFV3']:
             if pd.notna(row[feature]) & (row[feature] != -9):
                 # Combine 'RFVx_TEXT', followed by 'RFVx_MOD2', 'RFVx_MOD1'
-                row['TEXT'] = ' '.join([row['TEXT'], row[f'{feature}_TEXT'], row[f'{feature}_MOD2'], row[f'{feature}_MOD1']])
+                row['TEXT'] = ', '.join([row['TEXT'], row[f'{feature}_TEXT'], row[f'{feature}_MOD2'], row[f'{feature}_MOD1']])
             continue
 
         if feature in ['BMI', 'TEMPF', 'BPSYS', 'BPDIAS']:
             if pd.notna(row[feature]):
                 # Combine 'feature_GROUP'
-                row['TEXT'] = ' '.join([
+                row['TEXT'] = ', '.join([
                     row['TEXT'],
                     '_'.join(row[f'{feature}_GROUP'].split())
                 ])
@@ -254,78 +254,78 @@ def combine_textual(row, features):
         # Convert and combine `presentSymptomsStatus` as direct text description
         if feature == 'ARTHRTIS':
             if row[feature] == 1:
-                row['TEXT'] = ' '.join([row['TEXT'], 'Arthritis'])
+                row['TEXT'] = ', '.join([row['TEXT'], 'Arthritis'])
             continue
 
         if feature == 'ASTHMA':
             if row[feature] == 1:
-                row['TEXT'] = ' '.join([row['TEXT'], 'Asthma'])
+                row['TEXT'] = ', '.join([row['TEXT'], 'Asthma'])
             continue
 
         if feature == 'CANCER':
             if row[feature] == 1:
-                row['TEXT'] = ' '.join([row['TEXT'], 'Cancer'])
+                row['TEXT'] = ', '.join([row['TEXT'], 'Cancer'])
             continue
 
         if feature == 'CEBVD':
             if row[feature] == 1:
-                row['TEXT'] = ' '.join([row['TEXT'], 'Cerebrovascular_disease'])
+                row['TEXT'] = ', '.join([row['TEXT'], 'Cerebrovascular_disease'])
             continue
 
         if feature == 'CHF':
             if row[feature] == 1:
-                row['TEXT'] = ' '.join([row['TEXT'], 'Congestive_heart_failure'])
+                row['TEXT'] = ', '.join([row['TEXT'], 'Congestive_heart_failure'])
             continue
 
         if feature == 'CRF':
             if row[feature] == 1:
-                row['TEXT'] = ' '.join([row['TEXT'], 'Chronic_renal_failure'])
+                row['TEXT'] = ', '.join([row['TEXT'], 'Chronic_renal_failure'])
             continue
 
         if feature == 'COPD':
             if row[feature] == 1:
-                row['TEXT'] = ' '.join([row['TEXT'], 'Chronic_obstructive_pulmonary_disease'])
+                row['TEXT'] = ', '.join([row['TEXT'], 'Chronic_obstructive_pulmonary_disease'])
             continue
 
         if feature == 'DEPRN':
             if row[feature] == 1:
-                row['TEXT'] = ' '.join([row['TEXT'], 'Depression'])
+                row['TEXT'] = ', '.join([row['TEXT'], 'Depression'])
             continue
 
         if feature == 'DIABETES':
             if row[feature] == 1:
-                row['TEXT'] = ' '.join([row['TEXT'], 'Diabetes'])
+                row['TEXT'] = ', '.join([row['TEXT'], 'Diabetes'])
             continue
 
         if feature == 'HYPLIPID':
             if row[feature] == 1:
-                row['TEXT'] = ' '.join([row['TEXT'], 'Hyperlipidemia'])
+                row['TEXT'] = ', '.join([row['TEXT'], 'Hyperlipidemia'])
             continue
 
         if feature == 'HTN':
             if row[feature] == 1:
-                row['TEXT'] = ' '.join([row['TEXT'], 'Hypertension'])
+                row['TEXT'] = ', '.join([row['TEXT'], 'Hypertension'])
             continue
 
         if feature == 'IHD':
             if row[feature] == 1:
-                row['TEXT'] = ' '.join([row['TEXT'], 'Ischemic_heart_disease'])
+                row['TEXT'] = ', '.join([row['TEXT'], 'Ischemic_heart_disease'])
             continue
 
         if feature == 'OBESITY':
             if row[feature] == 1:
-                row['TEXT'] = ' '.join([row['TEXT'], 'Obesity'])
+                row['TEXT'] = ', '.join([row['TEXT'], 'Obesity'])
             continue
 
         if feature == 'OSTPRSIS':
             if row[feature] == 1:
-                row['TEXT'] = ' '.join([row['TEXT'], 'Osteoporosis'])
+                row['TEXT'] = ', '.join([row['TEXT'], 'Osteoporosis'])
             continue
 
         # Combine `physicianDiagnoses` and rule out 'PROBABLE, QUESTIONABLE, OR RULE OUT' diagnoses
         if feature in ['DIAG1', 'DIAG2', 'DIAG3']:
             if pd.notna(row[feature]) and (pd.isna(row[f'PR{feature}']) | row[f'PR{feature}'] != 1):
-                row['TEXT'] = ' '.join([row['TEXT'], row[f'{feature}_TEXT']])
+                row['TEXT'] = ', '.join([row['TEXT'], row[f'{feature}_TEXT']])
             continue
 
     return row['TEXT'].strip()
@@ -334,6 +334,7 @@ def combine_textual(row, features):
 def generate_topic_features(df, n_topics=10, n_top_words=10, transform=False, random_state=42):
     """Generate topic features (topic probabilities) from text features using LDA."""
     import spacy
+    import re
     from sklearn.feature_extraction.text import TfidfVectorizer
     from sklearn.decomposition import LatentDirichletAllocation
     import numpy as np
@@ -344,15 +345,29 @@ def generate_topic_features(df, n_topics=10, n_top_words=10, transform=False, ra
     # Preprocess the text features with Spacy
     nlp = spacy.load('en_core_web_sm')
 
-    def preprocess_text(text):
-        doc = nlp(text)
-        return ' '.join([token.lemma_.lower() for token in doc if not token.is_stop and not token.is_punct])
+    custom_stops = ['nos', 'oth', 'nec']
+    for word in custom_stops:
+        nlp.vocab[word].is_stop = True
 
-    df['TEXT'] = df['TEXT'].apply(preprocess_text)
+    def preprocess_text(text):
+        text = re.sub(r'\bdiabete\b', 'diabetes', text)
+        text = re.sub(r'\banom\b', 'anomaly', text)
+        text = re.sub(r'\bsho\b', 'shoulder', text)
+        text = re.sub(r'\both\b', 'other', text)
+        text = re.sub(r'\buns\b', 'unspecified', text)
+        
+        doc = nlp(text)
+        filtered_tokens = [
+            token.lemma_.lower() for token in doc
+            if (not token.is_stop) and (not token.is_punct)
+        ]
+        return ' '.join(filtered_tokens)
+
+    df['TEXT'] = df['TEXT'].apply(lambda row: preprocess_text(preprocess_text(row)))
 
     # Define the count vectorizer
     vectorizer = TfidfVectorizer(
-        #stop_words='english',
+        stop_words='english',
         ngram_range=(1, 1),
         max_features=1000,
         min_df=5,
@@ -367,7 +382,7 @@ def generate_topic_features(df, n_topics=10, n_top_words=10, transform=False, ra
     def display_topics(model, feature_names, n_top_words):
         for topic_idx, topic in enumerate(model.components_):
             print(f'Topic {topic_idx}:')
-            print(' '.join([feature_names[i] for i in topic.argsort()[:-n_top_words - 1:-1]]))
+            print(', '.join([feature_names[i] for i in topic.argsort()[:-n_top_words - 1:-1]]))
             print()
     
     display_topics(lda, vectorizer.get_feature_names_out(), n_top_words)
