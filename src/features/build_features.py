@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import pandas as pd
+import numpy as np
 import altair as alt
 
 
@@ -337,7 +338,6 @@ def generate_topic_features(df, n_topics=10, n_top_words=10, transform=False, ra
     import re
     from sklearn.feature_extraction.text import TfidfVectorizer
     from sklearn.decomposition import LatentDirichletAllocation
-    import numpy as np
 
     logger = logging.getLogger(__name__)
     logger.info('Generating topic features (topic probabilities) from text features using LDA\n')
@@ -508,8 +508,9 @@ def prepare_data(df, df_type, cleaned_data_path, figure_path, report_path, icd9c
     #procd_df = .generate_embeddings(procd_df)
 
     # Add in topic feature (topic probabilities) using LDA
+    transform = 'log'
     procd_df, vectorizer, tf, lda, topic_features = generate_topic_features(
-        procd_df, n_topics=10, n_top_words=10, transform='log'
+        procd_df, n_topics=10, n_top_words=10, transform=transform
     )
 
     # Visualize the topics with pyLDAvis
@@ -519,6 +520,9 @@ def prepare_data(df, df_type, cleaned_data_path, figure_path, report_path, icd9c
 
     # Plot the heat map of topic distributions among the labels in the dataset with Altair
     topic_df = procd_df[['DIAG1_CAT'] + topic_features].melt(id_vars='DIAG1_CAT', var_name='Topic', value_name='Probability')
+    # Reverse the log transformation
+    if transform == 'log':
+        topic_df['Probability'] = np.exp(topic_df['Probability']) - 0.0001
 
     chart(
         df=topic_df,
