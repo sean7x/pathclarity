@@ -546,3 +546,132 @@ def prepare_data(df, df_type, cleaned_data_path, figure_path, report_path, icd9c
     ).mark_bar().configure_axisX(labelAngle=45, labelLimit=300, title=None).configure_axisY(title=None).save(os.path.join(figure_path, f'{df_type}_label_distribution.png'), ppi=300)
     
     return procd_df
+
+
+def process_input(df, features):
+    """Load and prepare the data for classification, return the processed DataFrame."""
+    import os
+    import pyLDAvis
+    import pyLDAvis.lda_model
+
+    # Load and clean the REASON FOR VISIT classification summary of codes
+    rfv_path = os.path.join('..', 'data', 'raw', 'RFV_codes_summary.xlsx')
+    rfv_df = load_rfv(rfv_path)
+
+    def get_module(code):
+        """Find the `START` and `END` range, 
+        and map the corresponding `MODULE_1` and `MODULE_2` to X_train as new columns `MODULE_1` and `MODULE_2`, 
+        according to the value of `RFV1`, `RFV2`, and `RFV3` columns"""
+
+        module = rfv_df.loc[(rfv_df['START'] <= code) & (rfv_df['END'] >= code), ['MODULE_1', 'MODULE_2']]
+        if len(module) == 0:
+            return pd.Series([None, None], index=['MODULE_1', 'MODULE_2'])
+        else:
+            return module.iloc[0]
+    
+    def bin_age(age):
+        if pd.isna(age) or age == -9: return None
+        #if age < 2: return 'Infant'
+        #elif age < 4: return 'Toddler'
+        #elif age < 12: return 'Child'
+        #elif age < 20: return 'Teenager'
+        elif age < 20: return 'Child or Teenager'
+        elif age < 40: return 'Adult'
+        elif age < 60: return 'Middle Aged'
+        else: return 'Senior'
+    
+    def bin_bmi(bmi):
+        if pd.isna(bmi): return None
+        elif bmi < 18.5: return 'Underweight'
+        elif bmi < 25: return 'Normal weight'
+        elif bmi < 30: return 'Overweight'
+        else: return 'Obesity'
+    
+    def bin_tempf(tempf):
+        if pd.isna(tempf): return None
+        elif tempf < 95: return 'Hypothermia'
+        elif tempf < 99: return 'Normal temperature'
+        #elif tempf < 100: return 'Low grade fever'
+        elif tempf < 103: return 'Fever'
+        else: return 'Hyperpyrexia'
+    
+    def bin_bpsys(bpsys):
+        if pd.isna(bpsys): return None
+        elif bpsys < 90: return 'Hypotension'
+        elif bpsys < 120: return 'Normal blood pressure'
+        elif bpsys < 140: return 'Prehypertension'
+        else: return 'Hypertension'
+
+    def bin_bpdias(bpdias):
+        if pd.isna(bpdias): return None
+        elif bpdias < 60: return 'Low diastolic blood pressure'
+        elif bpdias < 90: return 'Normal diastolic blood pressure'
+        elif bpdias < 110: return 'High diastolic blood pressure'
+        else: return 'Hypertension'
+
+    # Bin the REASON FOR VISIT variables into RFV Modules
+    df[['RFV1_MOD1', 'RFV1_MOD2']] = df['RFV1'].apply(
+        lambda x: get_module(int(str(x)[:4])) if pd.notna(x) else pd.Series([None, None], index=['MODULE_1', 'MODULE_2'])
+    )
+    df[['RFV2_MOD1', 'RFV2_MOD2']] = df['RFV2'].apply(
+        lambda x: get_module(int(str(x)[:4])) if pd.notna(x) else pd.Series([None, None], index=['MODULE_1', 'MODULE_2'])
+    )
+    df[['RFV3_MOD1', 'RFV3_MOD2']] = df['RFV3'].apply(
+        lambda x: get_module(int(str(x)[:4])) if pd.notna(x) else pd.Series([None, None], index=['MODULE_1', 'MODULE_2'])
+    )
+
+    # Bin the AGE variable into AGE Groups
+    df['AGE_GROUP'] = df['AGE'].apply(bin_age)
+
+    # Bin the BMI variable into BMI Groups
+    df['BMI_GROUP'] = df['BMI'].apply(bin_bmi)
+
+    # Bin the TEMPF variable into TEMPF Groups
+    df['TEMPF_GROUP'] = df['TEMPF'].apply(bin_tempf)
+
+    # Bin the BPSYS variable into BPSYS Groups
+    df['BPSYS_GROUP'] = df['BPSYS'].apply(bin_bpsys)
+
+    # Bin the BPDIAS variable into BPDIAS Groups
+    df['BPDIAS_GROUP'] = df['BPDIAS'].apply(bin_bpdias)
+
+    # Handeling missing values in categorical features
+    # Fill the missing values in the categorical features
+    # with -9 for 'CASTAGE',
+    # with -9 for 'USETOBAC', 'INJDET', 'MAJOR',
+    # with -9 for 'RFV1', 'RFV2', 'RFV3'
+    # with 'NA' for 'RFV1_MOD1', 'RFV2_MOD1', 'RFV3_MOD1', 'RFV1_MOD2', 'RFV2_MOD2', 'RFV3_MOD2',
+    # with 'NA' for 'AGE_GROUP', 'BMI_GROUP', 'TEMPF_GROUP', 'BPSYS_GROUP', 'BPDIAS_GROUP'
+    #df.fillna({'CASTAGE': -9}, inplace=True)
+    df.fillna({'USETOBAC': -9, 'INJDET': -9, 'MAJOR': -9}, inplace=True)
+    df.fillna({'RFV1': -9, 'RFV2': -9, 'RFV3': -9}, inplace=True)
+    df.fillna(
+        {
+            'RFV1_MOD1': 'NA', 'RFV2_MOD1': 'NA', 'RFV3_MOD1': 'NA',
+            'RFV1_MOD2': 'NA', 'RFV2_MOD2': 'NA', 'RFV3_MOD2': 'NA',
+            'AGE_GROUP': 'NA', 'BMI_GROUP': 'NA', 'TEMPF_GROUP': 'NA', 'BPSYS_GROUP': 'NA', 'BPDIAS_GROUP': 'NA'
+        },
+        inplace=True
+    )
+
+    procd_df = df.loc[
+        :,
+        features + [
+            'RFV1_MOD1', 'RFV1_MOD2', 'RFV2_MOD1', 'RFV2_MOD2', 'RFV3_MOD1', 'RFV3_MOD2',
+            'AGE_GROUP', 'BMI_GROUP', 'TEMPF_GROUP', 'BPSYS_GROUP', 'BPDIAS_GROUP'
+        ]
+    ].copy()
+
+    # Combine and preprocess textual features
+    procd_df['TEXT'] = procd_df.apply(lambda x: combine_textual(x, features), axis=1)
+
+    # Add in sentence embeddings using BERT and pre-trained BiomedBERT model
+    #procd_df = .generate_embeddings(procd_df)
+
+    # Add in topic feature (topic probabilities) using LDA
+    transform = 'log'
+    procd_df, vectorizer, tf, lda, topic_features = generate_topic_features(
+        procd_df, n_topics=10, n_top_words=10, transform=transform
+    )
+    
+    return procd_df
