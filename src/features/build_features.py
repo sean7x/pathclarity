@@ -548,7 +548,7 @@ def prepare_data(df, df_type, cleaned_data_path, figure_path, report_path, icd9c
     return procd_df
 
 
-def process_input(df, features):
+def process_input(df, features, vectorizer, lda, transform='log'):
     """Load and prepare the data for classification, return the processed DataFrame."""
     import os
     import pyLDAvis
@@ -668,10 +668,22 @@ def process_input(df, features):
     # Add in sentence embeddings using BERT and pre-trained BiomedBERT model
     #procd_df = .generate_embeddings(procd_df)
 
-    # Add in topic feature (topic probabilities) using LDA
-    transform = 'log'
-    procd_df, vectorizer, tf, lda, topic_features = generate_topic_features(
-        procd_df, n_topics=10, n_top_words=10, transform=transform
-    )
-    
+    tf = vectorizer.transform(procd_df['TEXT'])
+
+    # Define the topic features
+    topics = lda.transform(tf)
+    topic_features = [f'TOPIC_{i}' for i in range(topics.shape[1])]
+    print(f'Topic Features: {topic_features}')
+    topics = pd.DataFrame(topics, columns=topic_features, index=procd_df.index)
+
+    # Transform the topic features with PowerTransformer or Log transformation
+    if transform == 'power':
+        topics = np.sqrt(topics)
+    elif transform == 'log':
+        topics = np.log(topics + 0.0001)
+
+    # Combine the topic features with procd_df
+    procd_df = pd.concat([procd_df, topics], axis=1)
+    print(f'DataFrame Shape: {procd_df.shape}')
+
     return procd_df
