@@ -3,13 +3,51 @@ PathClarity
 
 PathClarity by Team Watson
 
+## Introduction
+
+Patients often experience unease when they must visit the hospital outpatient department, as they may lack clarity about their illness, the required examinations, and the associated expenses.
+
+Machine learning with clinical data has long been in practice, offering substantial benefits.
+
+While numerous studies have explored diagnostic and support pathways for specific ailments like depression and diabetes, the application of these technologies in creating interactive self-check platforms remains less explored.
+
+Our project aims to:
+- Could analyzing medical encounter data reveal distinct patient groups with similar healthcare needs?
+- Could classification prediction on user-reported symptoms and health status enable the identification of potential treatment pathways in a statistical representation?
+
+## Method
+
+### Dataset
+- Outpatient dataset of National Hospital Ambulatory Medical Care Survey (NHAMCS) with ICD-9-CM
+
+### Preprocessing
+- Merged: by consolidating relevant columns, resulting in a dataset with 150 features.
+- Splitted into training (2006-2008), validation (2009), test (2010), and evaluation (2011) sets to maintain generalizability and adaptability to data shift.
+
+### Feature Engineering
+- Quantitative features: Binning or normalization based on stability and sensitivity requirements.
+- Categorical features: One-hot encoding
+- Text features: text extracted, integrated and transformed into topic features
+
+### Machine Learning
+ - Employed Random Forest Classifier to predict the classification of Diseases and Injuries
+
+
+## Results
+The specifics can be found in the concluding report (`./reports/final_report.pdf`).
+
+
+## Conclusion
+- Our machine learning analysis of NHAMCS outpatient data reveals key diagnostic pathways and supports, potentially improving patient understanding before medical consultations. 
+- Despite time and data limitations, our promising results endorse the application of machine learning in healthcare, setting a foundation for future interactive self-check platforms.
+
 
 ## About Watson
 
 The name of 'Watson' is adepted from the historical and famous 'Dr. Watson', a debugging tool included with the Microsoft Windows operating system since 1991.
 You may find more about it following the Wikipedia. (https://en.wikipedia.org/wiki/Dr._Watson_(debugger))
 
-Project Organization
+## Project Organization
 ------------
 
     ├── LICENSE
