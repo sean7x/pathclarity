@@ -103,8 +103,9 @@ You may find more about it following the Wikipedia. (https://en.wikipedia.org/wi
     │   │   └── make_dataset.py                                   <- Load and parse the ASCII OPD data files with SPSS code, save to ./data/cleaned as CSV files
     │   │
     │   ├── features       <- Scripts to turn raw data into features for modeling
-    │   │   └── build_features.py
-    │   │   └── combine_textual.py
+    │   │   ├── build_features.py                                 <- The main scripts to prepare and process the datasets, incl. handling missing values, convert │   │   │                                                        and combining text descriptions, computing TF-IDF, extracting topic features and export
+    │   │   │                                                        corresponding figures.
+    │   │   └── combine_textual.py                                <- The scripts used for combining textual features for the clustering apporoach.
     │   │
     │   ├── models         <- Scripts to train models and then use trained models to make
     │   │                     predictions
