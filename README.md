@@ -11,7 +11,7 @@ Machine learning with clinical data has long been in practice, offering substant
 
 While numerous studies have explored diagnostic and support pathways for specific ailments like depression and diabetes, the application of these technologies in creating interactive self-check platforms remains less explored.
 
-Our project aims to:
+Our project aims to answer the following:
 - Could analyzing medical encounter data reveal distinct patient groups with similar healthcare needs?
 - Could classification prediction on user-reported symptoms and health status enable the identification of potential treatment pathways in a statistical representation?
 
@@ -19,6 +19,11 @@ Our project aims to:
 
 ### Dataset
 - Outpatient dataset of National Hospital Ambulatory Medical Care Survey (NHAMCS) with ICD-9-CM
+The ASCII OPD data files can be downloaded from the following hyperlink:
+`https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NHAMCS/`
+- The accompanying SPSS Documentation and code, which can serve as helper files for parsing the ASCII data into Pandas DataFrames, can be download from the following:
+`https://ftp.cdc.gov/pub/Health_Statistics/NCHS/dataset_documentation/nhamcs/spss/`
+- The data files do not include any provider or patient identifying information. The utilization of the data should comply with all guidelines set forth by the CDC and NCHS and be used exclusively for the purpose of health services research. Any effort to re-identify the individuals shall be avoided.
 
 ### Preprocessing
 - Merged: by consolidating relevant columns, resulting in a dataset with 150 features.
